@@ -73,26 +73,28 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .maplabel{position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .mapdist{position:absolute;right:12px;top:8px;font-size:12px;color:var(--gold);font-weight:700}
 
-.photo{position:relative;height:250px;border-radius:26px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.photo{position:relative;height:330px;margin-top:6px;border-radius:26px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .photo img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;animation:kb 14s ease-in-out infinite alternate}
 @keyframes kb{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.14) translate(-3%,-2%)}}
 .photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(5,6,10,.92))}
-.photo .num{position:absolute;top:14px;left:14px;z-index:2;font-family:var(--serif);font-size:15px;font-weight:800;color:#1a1307;background:var(--gold);border-radius:999px;padding:5px 12px}
+/*n*/.photo .num{position:absolute;top:14px;left:14px;z-index:2;font-family:var(--serif);font-size:15px;font-weight:800;color:#1a1307;background:var(--gold);border-radius:999px;padding:5px 12px}
 .photo .credit{display:none;position:absolute;top:16px;right:14px;z-index:2;font-size:10px;color:rgba(255,255,255,.75);background:rgba(0,0,0,.35);padding:3px 8px;border-radius:8px}
 .photo .cap{position:absolute;left:18px;right:18px;bottom:16px;z-index:2}
 .photo h2{font-family:var(--serif);font-size:27px;line-height:1.08;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .photo p{color:#d9d3c7;font-size:13px}
 
-.reveal>*{opacity:0;transform:translateY(18px);animation:up .7s var(--ease) forwards}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 4px}
-.chip{background:rgba(95,208,196,.09);border:1px solid rgba(95,208,196,.28);color:#bff0ea;font-size:13px;padding:7px 12px;border-radius:999px;font-weight:600}
+.reveal>*{opacity:0;transform:translateY(14px);animation:up .6s var(--ease) forwards}
+.photo{opacity:0;animation:up .7s var(--ease) forwards}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.chip{background:rgba(95,208,196,.07);border:1px solid rgba(95,208,196,.22);color:#bff0ea;font-size:12px;padding:6px 11px;border-radius:999px;font-weight:600}
 .block{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
 .block h3{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.mline{margin-top:14px;font-size:15px;line-height:1.45;color:#e6e0d4;padding:0 2px}
 .block p{font-size:15px;line-height:1.5;color:#e6e0d4}
 .quote{position:relative;margin-top:12px;padding:16px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(224,122,140,.16),rgba(232,196,108,.08));border:1px solid rgba(224,122,140,.3)}
 .quote p{font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.4}
 .sig{margin-top:12px;font-size:13px;line-height:1.45;color:var(--muted);padding:0 4px}
-.mapbtn{margin-top:12px;width:100%;height:50px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.mapbtn{margin-top:14px;width:100%;height:44px;border-radius:14px;background:none;border:1px solid var(--line);color:var(--muted);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
 
 .nav{position:relative;flex:none;z-index:6;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;background:var(--bg);border-top:1px solid var(--line)}
 .nav .btn.ghost{flex:.38;font-size:20px}
@@ -280,40 +282,62 @@ function setTop(){
   $('#prev').style.opacity = idx === 0 ? .35 : 1;
 }
 const first=(t,n=120)=>{t=String(t||'');const m=t.match(/^.*?[.!?](\s|$)/);let r=m?m[0].trim():t;return r.length>n?r.slice(0,n-1).replace(/[\s,;:—-]+\S*$/,'')+'…':r};
-function pageHTML(i, prevIdx){
+function pageHTML(i){
   const p = P[i];
-  const dist = prevIdx != null && P[prevIdx].city === p.city ? `+${haversine(P[prevIdx], p).toFixed(1)} км` : `${P.filter(q=>q.city===p.city).length} точки`;
   const q = encodeURIComponent(p.name + ' ' + p.address);
-  return `<div class="mapcard"><div class="maplabel">схема · ${esc(C[p.city].name)}</div><div class="mapdist">${dist}</div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${mapSVG(p.city, i, prevIdx)}</svg></div>
-  <div class="photo"><img src="${p.photo}" alt=""><div class="num">№ ${p.id}</div><div class="credit">${esc(p.photo_credit||'')}</div>
-    <div class="cap"><h2>${esc(p.name)}</h2><p>📍 ${esc(p.address)}</p></div></div>
+  return `<div class="photo"><img src="${p.photo}" alt=""><div class="num">${p.id} / ${P.length}</div>
+    <div class="cap"><h2>${esc(p.name)}</h2><p>${esc(p.address.replace(/^[^,]+,\s*/,''))}</p></div></div>
   <div class="reveal">
     <div class="chips">${p.features.slice(0,3).map(f=>`<span class="chip">${esc(f)}</span>`).join('')}</div>
-    <div class="block"><h3>💆 Массаж</h3><p>${esc(first(p.massage,110))}</p></div>
+    <p class="mline">${esc(first(p.massage,100))}</p>
     <div class="quote"><p>${esc(p.joke)}</p></div>
-    <p class="sig">🏛 ${esc(first(p.significance,110))}</p>
-    <button class="mapbtn" data-q="${q}">🗺 Открыть на Яндекс Картах</button>
+    <button class="mapbtn" data-q="${q}">Открыть на карте ↗</button>
   </div>`;
 }
 function stagger(el){ [...el.querySelectorAll('.reveal>*')].forEach((n, j) => n.style.animationDelay = (0.25 + j*0.08) + 's'); }
 function render(dir, prevIdx){
   const stage = $('#stage'); const olds = [...stage.querySelectorAll('.page')];
   const pg = document.createElement('div'); pg.className = 'page ' + (dir === 'back' ? 'enterL' : dir ? 'enterR' : '');
-  pg.innerHTML = pageHTML(idx, prevIdx); stage.appendChild(pg); stagger(pg);
+  pg.innerHTML = pageHTML(idx); stage.appendChild(pg); stagger(pg);
   pg.querySelector('.mapbtn').onclick = e => { const url = 'https://yandex.ru/maps/?text=' + e.currentTarget.dataset.q; try{ tg.openLink(url) }catch(_){ window.open(url, '_blank') } };
   requestAnimationFrame(() => requestAnimationFrame(() => {
     pg.classList.remove('enterL', 'enterR');
     olds.forEach(old => { old.classList.add(dir === 'back' ? 'exitR' : 'exitL'); setTimeout(() => old.remove(), 700); });
-    setTimeout(() => animateLeg(pg), dir ? 450 : 250);
   }));
   setTop();
+}
+function hop(from, to, done){
+  const a = P[from], b = P[to], pts = P.filter(p => p.city === b.city);
+  const la = pts.map(p=>p.lat), lo = pts.map(p=>p.lon), k = Math.cos(b.lat*Math.PI/180);
+  const la0=Math.min(...la), la1=Math.max(...la), lo0=Math.min(...lo), lo1=Math.max(...lo);
+  const w=Math.max((lo1-lo0)*k,1e-4), h=Math.max(la1-la0,1e-4), sc=Math.min(260/w, 300/h);
+  const pr = p => [200 + (p.lon-(lo0+lo1)/2)*k*sc, 430 - (p.lat-(la0+la1)/2)*sc];
+  const A = pr(a), B = pr(b), km = haversine(a, b);
+  const mx=(A[0]+B[0])/2, my=Math.min(A[1],B[1])-40;
+  let s = `<defs><radialGradient id="g3"><stop offset="0" stop-color="#ffdf9a" stop-opacity=".9"/><stop offset="1" stop-color="#ffdf9a" stop-opacity="0"/></radialGradient></defs>`;
+  pts.forEach(p => { const [x,y]=pr(p); const on = p===a||p===b; s += `<circle cx="${x}" cy="${y}" r="${on?6:4}" fill="${on?'#e8c46c':'#3a3f55'}"/>`; });
+  s += `<path id="hl" d="M${A[0]} ${A[1]} Q ${mx} ${my} ${B[0]} ${B[1]}" fill="none" stroke="#ffdf9a" stroke-width="2.5" stroke-linecap="round"/><g id="hc"><circle r="16" fill="url(#g3)"/><circle r="5" fill="#fff3cf"/></g>`;
+  const svg = $('#flySvg'); svg.innerHTML = s;
+  $('#flyKicker').textContent = 'Точка ' + b.id; $('#flyTitle').textContent = b.name; $('.flytext .km').innerHTML = 'ещё <b id="flyKm">0</b> км';
+  ['#flyKicker','#flyTitle','.flytext .km'].forEach(q => { const n = $(q); n.style.animation = 'none'; n.offsetHeight; n.style.animation = ''; });
+  show('fly');
+  const hl = svg.querySelector('#hl'), hc = svg.querySelector('#hc'), L = hl.getTotalLength();
+  hl.style.strokeDasharray = L; hl.style.strokeDashoffset = L;
+  let alive = true; flyDone = () => { if(alive){ alive = false; done(); } };
+  const t0 = performance.now() + 500, dur = 1300;
+  (function f(t){ if(!alive) return; const q = Math.max(0, Math.min(1, (t-t0)/dur)), e = 1 - Math.pow(1-q, 3);
+    hl.style.strokeDashoffset = L*(1-e); const pt = hl.getPointAtLength(L*e); hc.setAttribute('transform', `translate(${pt.x},${pt.y})`);
+    $('#flyKm').textContent = (km*(1-e)).toFixed(1);
+    if(q < 1) requestAnimationFrame(f); else setTimeout(() => flyDone && flyDone(), 450); })(performance.now());
 }
 function go(to){
   if(busy || to < 0) return;
   if(to >= P.length){ finish(); return; }
   const from = idx; hap();
   if(to > from && P[to].city !== P[from].city){ busy = true; flight(P[from].city, P[to].city, () => { idx = to; show('trip'); render(null, null); busy = false; }); return; }
-  busy = true; idx = to; render(to < from ? 'back' : 'fwd', to > from ? from : null); setTimeout(() => busy = false, 650);
+  busy = true;
+  if(to > from){ hop(from, to, () => { idx = to; show('trip'); render(null, null); busy = false; }); return; }
+  idx = to; render('back', null); setTimeout(() => busy = false, 650);
 }
 $('#next').onclick = () => go(idx + 1);
 $('#prev').onclick = () => go(idx - 1);
