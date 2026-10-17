@@ -17,8 +17,8 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;overscroll-behavior:none}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .6s var(--ease)}
-.screen.on{opacity:1;pointer-events:auto}
+.screen{position:fixed;top:0;bottom:0;left:50%;width:100%;max-width:520px;transform:translateX(-50%);display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .6s var(--ease),visibility 0s .6s;overflow:hidden}
+.screen.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .6s var(--ease),visibility 0s}
 
 .orbs{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
 .orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:float 14s ease-in-out infinite}
@@ -62,7 +62,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .prog b.sep{margin-left:5px}
 .iconbtn{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:17px;flex:none}
 .stage{flex:1;position:relative;overflow:hidden}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 120px;-webkit-overflow-scrolling:touch;transition:transform .65s var(--ease),opacity .65s var(--ease)}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 24px;-webkit-overflow-scrolling:touch;transition:transform .65s var(--ease),opacity .65s var(--ease)}
 .page.enterR{transform:translateX(105%);opacity:0}
 .page.enterL{transform:translateX(-105%);opacity:0}
 .page.exitL{transform:translateX(-40%) scale(.92);opacity:0}
@@ -73,12 +73,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .maplabel{position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .mapdist{position:absolute;right:12px;top:8px;font-size:12px;color:var(--gold);font-weight:700}
 
-.photo{position:relative;height:300px;border-radius:26px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.photo{position:relative;height:250px;border-radius:26px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .photo img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;animation:kb 14s ease-in-out infinite alternate}
 @keyframes kb{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.14) translate(-3%,-2%)}}
 .photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(5,6,10,.92))}
 .photo .num{position:absolute;top:14px;left:14px;z-index:2;font-family:var(--serif);font-size:15px;font-weight:800;color:#1a1307;background:var(--gold);border-radius:999px;padding:5px 12px}
-.photo .credit{position:absolute;top:16px;right:14px;z-index:2;font-size:10px;color:rgba(255,255,255,.75);background:rgba(0,0,0,.35);padding:3px 8px;border-radius:8px}
+.photo .credit{display:none;position:absolute;top:16px;right:14px;z-index:2;font-size:10px;color:rgba(255,255,255,.75);background:rgba(0,0,0,.35);padding:3px 8px;border-radius:8px}
 .photo .cap{position:absolute;left:18px;right:18px;bottom:16px;z-index:2}
 .photo h2{font-family:var(--serif);font-size:27px;line-height:1.08;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .photo p{color:#d9d3c7;font-size:13px}
@@ -89,12 +89,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .block{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
 .block h3{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
 .block p{font-size:15px;line-height:1.5;color:#e6e0d4}
-.quote{position:relative;margin-top:12px;padding:18px 18px 18px 22px;border-radius:20px;background:linear-gradient(135deg,rgba(224,122,140,.16),rgba(232,196,108,.08));border:1px solid rgba(224,122,140,.3)}
-.quote:before{content:"“";position:absolute;left:10px;top:-14px;font-family:var(--serif);font-size:64px;color:var(--rose);opacity:.7}
-.quote p{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.45}
+.quote{position:relative;margin-top:12px;padding:16px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(224,122,140,.16),rgba(232,196,108,.08));border:1px solid rgba(224,122,140,.3)}
+.quote p{font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.4}
+.sig{margin-top:12px;font-size:13px;line-height:1.45;color:var(--muted);padding:0 4px}
 .mapbtn{margin-top:12px;width:100%;height:50px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
 
-.nav{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;background:linear-gradient(180deg,rgba(8,9,13,0),var(--bg) 40%)}
+.nav{position:relative;flex:none;z-index:6;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;background:var(--bg);border-top:1px solid var(--line)}
 .nav .btn.ghost{flex:.38;font-size:20px}
 
 #fly{z-index:10;background:#05060a}
@@ -279,6 +279,7 @@ function setTop(){
   $('#next').textContent = !nx ? 'Финиш 🏁' : (nx.city !== P[idx].city ? `В ${C[nx.city].name} ✈` : 'Дальше →');
   $('#prev').style.opacity = idx === 0 ? .35 : 1;
 }
+const first=(t,n=120)=>{t=String(t||'');const m=t.match(/^.*?[.!?](\s|$)/);let r=m?m[0].trim():t;return r.length>n?r.slice(0,n-1).replace(/[\s,;:—-]+\S*$/,'')+'…':r};
 function pageHTML(i, prevIdx){
   const p = P[i];
   const dist = prevIdx != null && P[prevIdx].city === p.city ? `+${haversine(P[prevIdx], p).toFixed(1)} км` : `${P.filter(q=>q.city===p.city).length} точки`;
@@ -287,10 +288,10 @@ function pageHTML(i, prevIdx){
   <div class="photo"><img src="${p.photo}" alt=""><div class="num">№ ${p.id}</div><div class="credit">${esc(p.photo_credit||'')}</div>
     <div class="cap"><h2>${esc(p.name)}</h2><p>📍 ${esc(p.address)}</p></div></div>
   <div class="reveal">
-    <div class="chips">${p.features.map(f=>`<span class="chip">${esc(f)}</span>`).join('')}</div>
-    <div class="block"><h3>💆 Массаж и процедуры</h3><p>${esc(p.massage)}</p></div>
+    <div class="chips">${p.features.slice(0,3).map(f=>`<span class="chip">${esc(f)}</span>`).join('')}</div>
+    <div class="block"><h3>💆 Массаж</h3><p>${esc(first(p.massage,110))}</p></div>
     <div class="quote"><p>${esc(p.joke)}</p></div>
-    <div class="block"><h3>🏛 Чем значимо</h3><p>${esc(p.significance)}</p></div>
+    <p class="sig">🏛 ${esc(first(p.significance,110))}</p>
     <button class="mapbtn" data-q="${q}">🗺 Открыть на Яндекс Картах</button>
   </div>`;
 }
