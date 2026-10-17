@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Массажки без границ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090d;--bg2:#11131b;--card:#151824;--line:#252a3a;
+  --text:#f4efe6;--muted:#9aa0b3;--gold:#e8c46c;--gold2:#ffdf9a;--rose:#e07a8c;--teal:#5fd0c4;
+  --serif:'Playfair Display',Georgia,serif;--sans:'Manrope',system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.22,.9,.24,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;overscroll-behavior:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .6s var(--ease)}
+.screen.on{opacity:1;pointer-events:auto}
+
+.orbs{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:float 14s ease-in-out infinite}
+.orb.a{width:340px;height:340px;background:#7a4a9a;top:-80px;left:-90px}
+.orb.b{width:300px;height:300px;background:#b5654f;bottom:-60px;right:-80px;animation-delay:-5s}
+.orb.c{width:220px;height:220px;background:#2f6b8a;top:40%;left:55%;animation-delay:-9s;opacity:.35}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-40px) scale(1.12)}}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.06;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+#hero{z-index:2;justify-content:flex-end;padding:0 24px calc(28px + env(safe-area-inset-bottom))}
+.hero-bg{position:absolute;inset:0;z-index:-1;overflow:hidden}
+.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.15);transition:opacity 1.6s ease,transform 7s linear}
+.hero-bg img.on{opacity:.55;transform:scale(1)}
+.hero-bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,9,13,.2) 0%,rgba(8,9,13,.55) 45%,var(--bg) 82%)}
+.kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px;opacity:0;animation:up .9s var(--ease) .2s forwards}
+.h1{font-family:var(--serif);font-weight:800;font-size:46px;line-height:1.02;margin-bottom:14px}
+.h1 span{display:block;opacity:0;transform:translateY(30px);animation:up 1s var(--ease) forwards}
+.h1 span:nth-child(2){animation-delay:.15s;font-style:italic;color:var(--gold2)}
+.sub{color:#cfc8bb;font-size:16px;line-height:1.45;margin-bottom:22px;opacity:0;animation:up .9s var(--ease) .5s forwards}
+.stats{display:flex;gap:10px;margin-bottom:22px;opacity:0;animation:up .9s var(--ease) .65s forwards}
+.stat{flex:1;background:rgba(21,24,36,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;padding:12px 10px;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:26px;color:var(--gold)}
+.stat small{color:var(--muted);font-size:11px}
+.cta{display:flex;gap:10px;opacity:0;animation:up .9s var(--ease) .8s forwards}
+.btn{flex:1;height:56px;border-radius:18px;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s}
+.btn:active{transform:scale(.96)}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold) 50%,#c9963f);color:#1a1307;box-shadow:0 10px 30px rgba(232,196,108,.35);position:relative;overflow:hidden}
+.btn.gold:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,60%{left:-60%}100%{left:130%}}
+.btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);flex:.7}
+@keyframes up{to{opacity:1;transform:none}}
+
+#trip{z-index:3;background:var(--bg)}
+.top{padding:calc(12px + env(safe-area-inset-top)) 16px 8px;display:flex;align-items:center;gap:10px;position:relative;z-index:5}
+.citychip{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px 7px 8px;font-weight:700;font-size:14px;white-space:nowrap}
+.citychip i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(232,196,108,.15)}
+.prog{flex:1;display:flex;gap:4px}
+.prog b{flex:1;height:4px;border-radius:4px;background:var(--line);overflow:hidden;position:relative}
+.prog b:after{content:"";position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.prog b.done:after{transform:scaleX(1)}
+.prog b.sep{margin-left:5px}
+.iconbtn{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:17px;flex:none}
+.stage{flex:1;position:relative;overflow:hidden}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 120px;-webkit-overflow-scrolling:touch;transition:transform .65s var(--ease),opacity .65s var(--ease)}
+.page.enterR{transform:translateX(105%);opacity:0}
+.page.enterL{transform:translateX(-105%);opacity:0}
+.page.exitL{transform:translateX(-40%) scale(.92);opacity:0}
+.page.exitR{transform:translateX(40%) scale(.92);opacity:0}
+
+.mapcard{position:relative;height:150px;border-radius:22px;background:radial-gradient(120% 120% at 30% 20%,#1b2034,#0e1019);border:1px solid var(--line);overflow:hidden;margin-bottom:12px}
+.mapcard svg{position:absolute;inset:0;width:100%;height:100%}
+.maplabel{position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.mapdist{position:absolute;right:12px;top:8px;font-size:12px;color:var(--gold);font-weight:700}
+
+.photo{position:relative;height:300px;border-radius:26px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.photo img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;animation:kb 14s ease-in-out infinite alternate}
+@keyframes kb{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.14) translate(-3%,-2%)}}
+.photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(5,6,10,.92))}
+.photo .num{position:absolute;top:14px;left:14px;z-index:2;font-family:var(--serif);font-size:15px;font-weight:800;color:#1a1307;background:var(--gold);border-radius:999px;padding:5px 12px}
+.photo .credit{position:absolute;top:16px;right:14px;z-index:2;font-size:10px;color:rgba(255,255,255,.75);background:rgba(0,0,0,.35);padding:3px 8px;border-radius:8px}
+.photo .cap{position:absolute;left:18px;right:18px;bottom:16px;z-index:2}
+.photo h2{font-family:var(--serif);font-size:27px;line-height:1.08;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.photo p{color:#d9d3c7;font-size:13px}
+
+.reveal>*{opacity:0;transform:translateY(18px);animation:up .7s var(--ease) forwards}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 4px}
+.chip{background:rgba(95,208,196,.09);border:1px solid rgba(95,208,196,.28);color:#bff0ea;font-size:13px;padding:7px 12px;border-radius:999px;font-weight:600}
+.block{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
+.block h3{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.block p{font-size:15px;line-height:1.5;color:#e6e0d4}
+.quote{position:relative;margin-top:12px;padding:18px 18px 18px 22px;border-radius:20px;background:linear-gradient(135deg,rgba(224,122,140,.16),rgba(232,196,108,.08));border:1px solid rgba(224,122,140,.3)}
+.quote:before{content:"“";position:absolute;left:10px;top:-14px;font-family:var(--serif);font-size:64px;color:var(--rose);opacity:.7}
+.quote p{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.45}
+.mapbtn{margin-top:12px;width:100%;height:50px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;background:linear-gradient(180deg,rgba(8,9,13,0),var(--bg) 40%)}
+.nav .btn.ghost{flex:.38;font-size:20px}
+
+#fly{z-index:10;background:#05060a}
+#fly svg{position:absolute;inset:0;width:100%;height:100%}
+.flytext{position:absolute;left:0;right:0;top:calc(40px + env(safe-area-inset-top));text-align:center;z-index:2}
+.flytext small{display:block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:8px;opacity:0;animation:up .8s var(--ease) .1s forwards}
+.flytext h2{font-family:var(--serif);font-size:34px;opacity:0;animation:up .8s var(--ease) .25s forwards}
+.flytext .km{margin-top:10px;font-size:15px;color:var(--muted);opacity:0;animation:up .8s var(--ease) .4s forwards}
+.flytext .km b{color:var(--text);font-size:22px;font-variant-numeric:tabular-nums}
+.skip{position:absolute;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:3;font-size:13px;color:var(--muted);padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06)}
+.flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,223,154,.9),rgba(255,223,154,0) 60%);opacity:0;z-index:4;pointer-events:none}
+.flash.go{animation:flash .9s ease forwards}
+@keyframes flash{0%{opacity:0;transform:scale(.4)}40%{opacity:1}100%{opacity:0;transform:scale(2.4)}}
+
+#list{z-index:4;background:var(--bg)}
+.lscroll{flex:1;overflow-y:auto;padding:0 16px 40px}
+.lcity{font-family:var(--serif);font-size:24px;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+.lcity small{font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:600}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.litem{position:relative;height:170px;border-radius:18px;overflow:hidden;text-align:left;opacity:0;animation:up .6s var(--ease) forwards}
+.litem img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.litem:active img{transform:scale(1.08)}
+.litem:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.9))}
+.litem b{position:absolute;left:10px;top:10px;z-index:2;background:var(--gold);color:#1a1307;border-radius:999px;font-size:12px;padding:2px 9px}
+.litem span{position:absolute;left:10px;right:10px;bottom:10px;z-index:2;font-weight:700;font-size:13px;line-height:1.25}
+
+#fin{z-index:5;align-items:center;justify-content:center;text-align:center;padding:24px;background:var(--bg)}
+.fin-ring{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;font-size:62px;background:radial-gradient(circle,rgba(232,196,108,.25),transparent 70%);border:1px solid rgba(232,196,108,.4);margin-bottom:22px;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,196,108,.35)}50%{box-shadow:0 0 0 22px rgba(232,196,108,0)}}
+#fin h2{font-family:var(--serif);font-size:38px;margin-bottom:10px}
+#fin p{color:#cfc8bb;line-height:1.5;margin-bottom:22px;max-width:340px}
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%;max-width:360px;margin-bottom:24px}
+.thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;opacity:0;animation:pop .5s var(--ease) forwards}
+@keyframes pop{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+.fin-btns{display:flex;gap:10px;width:100%;max-width:360px}
+canvas#conf{position:fixed;inset:0;width:100%;height:100%;z-index:6;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="orbs"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+<div class="grain"></div>
+
+<section id="hero" class="screen on">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="kicker">Учебный проект · ВШЭ</div>
+  <div class="h1"><span>Массажки</span><span>без границ</span></div>
+  <div class="sub">Гид по расслабону Дона и Подмосковья: от армянской Нахичевани до Рублёвки.</div>
+  <div class="stats">
+    <div class="stat"><b>10</b><small>точек</small></div>
+    <div class="stat"><b>3</b><small>города</small></div>
+    <div class="stat"><b id="kmTotal">~1100</b><small>км пути</small></div>
+  </div>
+  <div class="cta">
+    <button class="btn gold" id="go">Поехали ▶</button>
+    <button class="btn ghost" id="toList">Все точки</button>
+  </div>
+</section>
+
+<section id="trip" class="screen">
+  <div class="top">
+    <button class="iconbtn" id="home">⌂</button>
+    <div class="citychip"><i id="cEmoji"></i><span id="cName"></span></div>
+    <div class="prog" id="prog"></div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="nav">
+    <button class="btn ghost" id="prev">←</button>
+    <button class="btn gold" id="next">Дальше →</button>
+  </div>
+</section>
+
+<section id="fly" class="screen">
+  <svg id="flySvg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice"></svg>
+  <div class="flytext"><small id="flyKicker"></small><h2 id="flyTitle"></h2><div class="km">в пути <b id="flyKm">0</b> км</div></div>
+  <div class="flash" id="flash"></div>
+  <button class="skip" id="skip">Пропустить »</button>
+</section>
+
+<section id="list" class="screen">
+  <div class="top"><button class="iconbtn" id="listBack">←</button><div style="font-family:var(--serif);font-size:22px">Все точки</div></div>
+  <div class="lscroll" id="lscroll"></div>
+</section>
+
+<section id="fin" class="screen">
+  <div class="fin-ring">🏆</div>
+  <h2>Маршрут пройден!</h2>
+  <p>10 точек, 3 города и ни одного дедлайна. Ты официально расслаблен на уровне федерального округа.</p>
+  <div class="thumbs" id="thumbs"></div>
+  <div class="fin-btns"><button class="btn ghost" id="again">Сначала</button><button class="btn gold" id="finList">Все точки</button></div>
+</section>
+<canvas id="conf"></canvas>
+
+<script>
+const DATA = {"title": "Массажки без границ", "subtitle": "Гид по расслабону Дона и Подмосковья", "cities": [{"id": "rostov", "name": "Ростов-на-Дону", "emoji": "🌊", "intro": "Южная столица, где расслабляются с видом на историю: от армянской Нахичевани до отелей со своим хамамом.", "lat": 47.2357, "lon": 39.7015}, {"id": "serpukhov", "name": "Серпухов", "emoji": "🌲", "intro": "Подмосковный город, где отдых — это русская баня на дровах и тишина вместо городского шума.", "lat": 54.9135, "lon": 37.411}, {"id": "odintsovo", "name": "Одинцово", "emoji": "🏡", "intro": "Рублёвка и её соседи: спа здесь есть на любой кошелёк — от сауны у трассы до загородного СПА.", "lat": 55.678, "lon": 37.278}], "points": [{"id": 1, "city": "rostov", "name": "Benamar Hotel & SPA", "address": "Ростов-на-Дону, Нахичевань, ул. Ченцова, 12/42", "features": ["крытый бассейн 18 м", "джакузи с гидромассажем", "финская и римская бани", "хамам", "турецкая баня"], "massage": "Классический, расслабляющий, массаж головы, рук, спины и стоп (от 1 500 ₽).", "joke": "Нахичевань в Ростове знают как армянский район, а теперь ещё и как место, где мнут не только спину, но и мысли о дедлайне. Мнёшь — значит живёшь.", "significance": "Район Нахичевань основан в 1779 году переселенцами-армянами из Крыма и со временем стал частью Ростова. Современный спа-отель продолжает традицию гостеприимства этого места.", "source": "101hotels.com, статья НКФУ о Нахичевани", "lat": 47.2295, "lon": 39.772, "photo": "img/1.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 2, "city": "rostov", "name": "Ramada by Wyndham Rostov-on-Don Hotel & SPA", "address": "Ростов-на-Дону, ул. Малюгиной, 119", "features": ["крытый бассейн", "финская сауна", "турецкий хамам", "джакузи", "солевая комната", "восточные спа-люксы"], "massage": "Массаж, пилинг, обёртывания, паровые и прогревающие процедуры, чайная церемония. Спа работает ежедневно с 9:00 до 21:00.", "joke": "Спа в паре минут от вокзала Ростов-Главный: можно приехать с чемоданом и уехать с лицом человека, который никуда не торопится.", "significance": "Рядом вокзал Ростов-Главный, зоопарк, Городской сад и цирк: хороший узел городского маршрута и пример международного отельного бренда в региональной экономике.", "source": "Wyndham Hotels (официальный сайт отеля)", "lat": 47.2205, "lon": 39.7, "photo": "img/2.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 3, "city": "rostov", "name": "Marins Park Hotel, спа «Mon Plaisir»", "address": "Ростов-на-Дону, Буденновский пр., 59", "features": ["финская сауна", "турецкий хамам", "бассейны с подогревом и гейзерами", "джакузи с аэрогидромассажем", "ароматерапия", "комната отдыха"], "massage": "«Массажный клуб» и массаж всего тела.", "joke": "Название спа «Mon Plaisir» в переводе с французского «моё удовольствие». Лучший слоган для студента, у которого сдан последний зачёт.", "significance": "Находится на Буденновском проспекте, одной из главных магистралей Ростова, в Октябрьском районе, примерно в двух километрах от площади Советов.", "source": "tonkosti.ru (карточка отеля)", "lat": 47.2262, "lon": 39.7125, "photo": "img/3.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 4, "city": "rostov", "name": "Customs House Hotel", "address": "Ростов-на-Дону, ул. Филимоновская, 180/91", "features": ["бассейн 7×4 м с подогревом", "хамам", "сауна", "баня"], "massage": "Массаж по запросу.", "joke": "Название «Таможенный дом» намекает, что здесь досматривают только усталость: стресс изымают на входе.", "significance": "Гости отмечают необычную архитектуру здания и сочетание истории с современностью.", "source": "101hotels.com (карточка отеля)", "lat": 47.2185, "lon": 39.6965, "photo": "img/4.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 5, "city": "serpukhov", "name": "Парк-Отель Воздвиженское", "address": "Серпухов, посёлок дома отдыха Авангард, с. 1", "features": ["закрытый и открытый бассейны", "русская баня на дровах (+2 000 ₽)", "сауна/спа", "услуги банщика и веники", "увлажняющая маска"], "massage": "Классический массаж (оплачивается отдельно) и массаж вениками.", "joke": "Баня на дровах, банщик и веники: в Серпухове умеют отхлестать так, что дедлайны сами просятся на пенсию.", "significance": "Место сочетает традицию русской бани с современным спа; название посёлка («дом отдыха») отражает давнюю подмосковную традицию загородного отдыха.", "source": "101hotels.com (карточка отеля)", "lat": 54.883, "lon": 37.342, "photo": "img/5.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 6, "city": "serpukhov", "name": "Загородный отель «Лесная ласточка»", "address": "Серпухов, тер. Глубоково-3, д. 1", "features": ["тёплый бассейн", "русская баня", "хамам"], "massage": "Массаж по запросу.", "joke": "Ласточки низко летают к дождю, а студенты ко всем, кто обещает баню и тишину.", "significance": "Пример загородного отдыха рядом с Серпуховом, где баня остаётся центром отдыха, как в русской традиции.", "source": "101hotels.com (список спа-отелей Серпухова, 7 отзывов)", "lat": 54.905, "lon": 37.3, "photo": "img/6.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 7, "city": "serpukhov", "name": "База отдыха «Лесная опушка»", "address": "Серпухов, д. Лужки", "features": ["бассейн", "джакузи", "баня", "хамам", "солевая комната", "кресло-массажёр"], "massage": "Кресло-массажёр.", "joke": "Кресло-массажёр — единственный в мире друг, который сам разминает плечи и не просит за это конспект.", "significance": "База отдыха в Серпуховском округе, пример местного туристического бизнеса.", "source": "101hotels.com (список спа-отелей Серпухова, 9 отзывов)", "lat": 54.89, "lon": 37.58, "photo": "img/7.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 8, "city": "odintsovo", "name": "Лесной Кантри Хауз", "address": "Одинцовский р-н, ДП Лесной городок, ул. Школьная, 6А", "features": ["бассейн", "баня", "сауна", "хамам"], "massage": "Массаж (оплачивается отдельно). Спа доступно детям старше 14 лет.", "joke": "Отзыв гостя: «Отличная спа зона». Короткий, но самый честный слоган для любого курорта.", "significance": "Открыт в 2018 году в Лесном городке (Одинцовский округ), пример современной загородной инфраструктуры Подмосковья.", "source": "101hotels.com (карточка отеля)", "lat": 55.638, "lon": 37.212, "photo": "img/8.jpg", "photo_credit": "Фото: mirturbaz.ru"}, {"id": 9, "city": "odintsovo", "name": "Barvikha Hotel & SPA", "address": "Одинцовский округ, д. Барвиха, Рублёво-Успенское ш., 114/3", "features": ["спа-процедуры", "оценка гостей 9.4/10 (по 215 отзывам)"], "massage": "Спа-процедуры, по отзывам гостей приемлемые по цене и качеству.", "joke": "Барвиха: здесь расслабляются те, чей график расписан лучше, чем у президента вуза. Мы заходим мысленно.", "significance": "Барвиха ассоциируется с Рублёво-Успенским направлением, символом элитного подмосковного отдыха.", "source": "101hotels.com (список спа-отелей Одинцовского района)", "lat": 55.737, "lon": 37.278, "photo": "img/9.jpg", "photo_credit": "Фото: 101hotels.com"}, {"id": 10, "city": "odintsovo", "name": "Отель «Матвеевский»", "address": "Одинцово, д. Вырубово, д. 2, 23-й км М-1 «Беларусь»", "features": ["сауна (оплачивается отдельно)"], "massage": "Массаж по запросу.", "joke": "Сауна у трассы М-1: для тех, кто ехал на дачу, а приехал на перезагрузку.", "significance": "Точка у федеральной трассы М-1, удобная остановка на пути между Москвой и регионами.", "source": "101hotels.com (карточка отеля)", "lat": 55.665, "lon": 37.333, "photo": "img/10.jpg", "photo_credit": "Фото: 101hotels.com"}]};
+const tg = window.Telegram && Telegram.WebApp && Telegram.WebApp.initData !== undefined ? Telegram.WebApp : null;
+try{ tg.ready(); tg.expand(); tg.setHeaderColor('#08090d'); tg.setBackgroundColor('#08090d'); tg.disableVerticalSwipes && tg.disableVerticalSwipes(); }catch(e){}
+const hap = (t='light')=>{ try{ tg.HapticFeedback.impactOccurred(t) }catch(e){} };
+const $ = s => document.querySelector(s);
+const P = DATA.points, C = Object.fromEntries(DATA.cities.map(c=>[c.id,c]));
+const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+P.forEach(p => { const i = new Image(); i.src = p.photo; });
+
+let cur = 'hero';
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+  cur = id;
+  try{ (id === 'hero') ? tg.BackButton.hide() : tg.BackButton.show(); }catch(e){}
+}
+try{ tg.BackButton.onClick(() => { if(cur !== 'hero' && cur !== 'fly') show('hero'); }); }catch(e){}
+
+(function(){
+  const bg = $('#heroBg'); const imgs = P.map(p => { const i = document.createElement('img'); i.src = p.photo; bg.appendChild(i); return i; });
+  let k = 0; const tick = () => { imgs.forEach((im, j) => im.classList.toggle('on', j === k)); k = (k + 1) % imgs.length; };
+  tick(); setInterval(tick, 3500);
+})();
+
+function haversine(a, b){ const R = 6371, r = x => x * Math.PI / 180;
+  const dLat = r(b.lat - a.lat), dLon = r(b.lon - a.lon);
+  const h = Math.sin(dLat/2)**2 + Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLon/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+(function(){ let s = 0; for(let i = 1; i < P.length; i++) s += haversine(P[i-1], P[i]); $('#kmTotal').textContent = '~' + Math.round(s/50)*50; })();
+
+const W = 400, H = 150;
+function cityProj(cityId){
+  const pts = P.filter(p => p.city === cityId), c = C[cityId];
+  const all = pts.concat([c]);
+  const la0 = Math.min(...all.map(p=>p.lat)), la1 = Math.max(...all.map(p=>p.lat));
+  const lo0 = Math.min(...all.map(p=>p.lon)), lo1 = Math.max(...all.map(p=>p.lon));
+  const k = Math.cos(c.lat*Math.PI/180);
+  const w = (lo1-lo0)*k, h = la1-la0;
+  const sc = Math.min(290/Math.max(w,1e-4), 82/Math.max(h,1e-4));
+  const cx = (lo0+lo1)/2, cy = (la0+la1)/2;
+  return p => [W/2 + (p.lon-cx)*k*sc, H/2 + 10 - (p.lat-cy)*sc];
+}
+const DECOR = {
+  rostov: { label:'Дон', path:'M-10 140 C 80 126, 150 146, 230 134 S 360 122, 420 136', river:true },
+  serpukhov: { label:'Ока', path:'M-10 144 C 90 132, 160 148, 250 138 S 360 126, 420 140', river:true },
+  odintsovo: { label:'М-1', path:'M-10 120 L 420 86', river:false }
+};
+function mapSVG(cityId, idx, prevIdx){
+  const proj = cityProj(cityId), pts = P.filter(p => p.city === cityId), d = DECOR[cityId];
+  let s = `<defs><radialGradient id="glow"><stop offset="0" stop-color="#ffdf9a" stop-opacity=".9"/><stop offset="1" stop-color="#ffdf9a" stop-opacity="0"/></radialGradient>
+  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#ffffff" stroke-opacity=".05"/></pattern></defs>
+  <rect width="${W}" height="${H}" fill="url(#grid)"/>`;
+  s += d.river
+    ? `<path d="${d.path}" fill="none" stroke="#2f6b8a" stroke-width="10" stroke-opacity=".45" stroke-linecap="round"/><text x="372" y="122" fill="#5fa8c8" font-size="10" font-family="Manrope" opacity=".85">${d.label}</text>`
+    : `<path d="${d.path}" fill="none" stroke="#5a5f73" stroke-width="4" stroke-dasharray="14 8" stroke-opacity=".7"/><text x="372" y="80" fill="#9aa0b3" font-size="10" font-family="Manrope">${d.label}</text>`;
+  const [ccx, ccy] = proj(C[cityId]);
+  s += `<circle cx="${ccx}" cy="${ccy}" r="3" fill="#9aa0b3"/><text x="${ccx+6}" y="${ccy-6}" fill="#9aa0b3" font-size="9" font-family="Manrope">${cityId==='odintsovo'?'Одинцово':'центр'}</text>`;
+  const xy = pts.map(proj);
+  s += `<polyline points="${xy.map(q=>q.join(',')).join(' ')}" fill="none" stroke="#e8c46c" stroke-opacity=".25" stroke-width="2" stroke-dasharray="3 5"/>`;
+  if(prevIdx != null && P[prevIdx] && P[prevIdx].city === cityId){
+    const [x0, y0] = proj(P[prevIdx]), [x1, y1] = proj(P[idx]);
+    const mx = (x0+x1)/2, my = Math.min(y0,y1) - 34;
+    s += `<path id="leg" d="M${x0} ${y0} Q ${mx} ${my} ${x1} ${y1}" fill="none" stroke="#ffdf9a" stroke-width="2.5" stroke-linecap="round"/>`;
+  }
+  pts.forEach((p, j) => {
+    const [x, y] = xy[j]; const gi = P.indexOf(p); const active = gi === idx; const done = gi < idx;
+    s += `<g>${active?`<circle cx="${x}" cy="${y}" r="20" fill="url(#glow)"><animate attributeName="r" values="14;26;14" dur="2s" repeatCount="indefinite"/></circle>`:''}
+      <circle cx="${x}" cy="${y}" r="${active?9:7}" fill="${active?'#e8c46c':done?'#8a7646':'#2a2f42'}" stroke="${active?'#fff3cf':'#e8c46c'}" stroke-opacity="${active?1:.5}" stroke-width="1.5"/>
+      <text x="${x}" y="${y+3.3}" text-anchor="middle" font-size="9" font-weight="800" font-family="Manrope" fill="${active?'#1a1307':'#f4efe6'}">${p.id}</text></g>`;
+  });
+  if(prevIdx != null && P[prevIdx] && P[prevIdx].city === cityId) s += `<g id="car"><circle r="12" fill="url(#glow)"/><circle r="5" fill="#fff3cf"/></g>`;
+  return s;
+}
+function animateLeg(root){
+  const leg = root.querySelector('#leg'), car = root.querySelector('#car'); if(!leg) return;
+  const L = leg.getTotalLength(); leg.style.strokeDasharray = L; leg.style.strokeDashoffset = L;
+  const t0 = performance.now(), dur = 1100;
+  (function f(t){ const k = Math.min(1, Math.max(0, (t - t0)/dur)), e = 1 - Math.pow(1-k, 3);
+    leg.style.strokeDashoffset = L*(1-e); const pt = leg.getPointAtLength(L*e); car.setAttribute('transform', `translate(${pt.x},${pt.y})`);
+    if(k < 1) requestAnimationFrame(f); else { car.style.transition='opacity .5s'; car.style.opacity = 0; } })(t0);
+}
+
+let idx = 0, busy = false;
+const prog = $('#prog');
+P.forEach((p, i) => { const b = document.createElement('b'); if(i>0 && P[i-1].city !== p.city) b.className = 'sep'; prog.appendChild(b); });
+function setTop(){
+  const c = C[P[idx].city]; $('#cEmoji').textContent = c.emoji; $('#cName').textContent = c.name;
+  [...prog.children].forEach((b, i) => b.classList.toggle('done', i <= idx));
+  const nx = P[idx+1];
+  $('#next').textContent = !nx ? 'Финиш 🏁' : (nx.city !== P[idx].city ? `В ${C[nx.city].name} ✈` : 'Дальше →');
+  $('#prev').style.opacity = idx === 0 ? .35 : 1;
+}
+function pageHTML(i, prevIdx){
+  const p = P[i];
+  const dist = prevIdx != null && P[prevIdx].city === p.city ? `+${haversine(P[prevIdx], p).toFixed(1)} км` : `${P.filter(q=>q.city===p.city).length} точки`;
+  const q = encodeURIComponent(p.name + ' ' + p.address);
+  return `<div class="mapcard"><div class="maplabel">схема · ${esc(C[p.city].name)}</div><div class="mapdist">${dist}</div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${mapSVG(p.city, i, prevIdx)}</svg></div>
+  <div class="photo"><img src="${p.photo}" alt=""><div class="num">№ ${p.id}</div><div class="credit">${esc(p.photo_credit||'')}</div>
+    <div class="cap"><h2>${esc(p.name)}</h2><p>📍 ${esc(p.address)}</p></div></div>
+  <div class="reveal">
+    <div class="chips">${p.features.map(f=>`<span class="chip">${esc(f)}</span>`).join('')}</div>
+    <div class="block"><h3>💆 Массаж и процедуры</h3><p>${esc(p.massage)}</p></div>
+    <div class="quote"><p>${esc(p.joke)}</p></div>
+    <div class="block"><h3>🏛 Чем значимо</h3><p>${esc(p.significance)}</p></div>
+    <button class="mapbtn" data-q="${q}">🗺 Открыть на Яндекс Картах</button>
+  </div>`;
+}
+function stagger(el){ [...el.querySelectorAll('.reveal>*')].forEach((n, j) => n.style.animationDelay = (0.25 + j*0.08) + 's'); }
+function render(dir, prevIdx){
+  const stage = $('#stage'); const olds = [...stage.querySelectorAll('.page')];
+  const pg = document.createElement('div'); pg.className = 'page ' + (dir === 'back' ? 'enterL' : dir ? 'enterR' : '');
+  pg.innerHTML = pageHTML(idx, prevIdx); stage.appendChild(pg); stagger(pg);
+  pg.querySelector('.mapbtn').onclick = e => { const url = 'https://yandex.ru/maps/?text=' + e.currentTarget.dataset.q; try{ tg.openLink(url) }catch(_){ window.open(url, '_blank') } };
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    pg.classList.remove('enterL', 'enterR');
+    olds.forEach(old => { old.classList.add(dir === 'back' ? 'exitR' : 'exitL'); setTimeout(() => old.remove(), 700); });
+    setTimeout(() => animateLeg(pg), dir ? 450 : 250);
+  }));
+  setTop();
+}
+function go(to){
+  if(busy || to < 0) return;
+  if(to >= P.length){ finish(); return; }
+  const from = idx; hap();
+  if(to > from && P[to].city !== P[from].city){ busy = true; flight(P[from].city, P[to].city, () => { idx = to; show('trip'); render(null, null); busy = false; }); return; }
+  busy = true; idx = to; render(to < from ? 'back' : 'fwd', to > from ? from : null); setTimeout(() => busy = false, 650);
+}
+$('#next').onclick = () => go(idx + 1);
+$('#prev').onclick = () => go(idx - 1);
+$('#home').onclick = () => show('hero');
+$('#go').onclick = () => { hap('medium'); idx = 0; show('trip'); render(null, null); };
+(function(){ let x0 = null, y0 = 0; const st = $('#stage');
+  st.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, {passive:true});
+  st.addEventListener('touchend', e => { if(x0 == null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if(Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy)*1.5) go(idx + (dx < 0 ? 1 : -1)); x0 = null; }, {passive:true});
+})();
+
+const FLY = {
+  'rostov>serpukhov': { kicker:'Перелёт', title:'Ростов → Серпухов', icon:'✈️', box:[46.4, 56.3, 34.0, 42.0],
+    refs:[['Воронеж',51.67,39.18],['Тула',54.19,37.62],['Москва',55.75,37.62],['Курск',51.73,36.19],['Липецк',52.61,39.6]], curve:-80 },
+  'serpukhov>odintsovo': { kicker:'Трансфер', title:'Серпухов → Одинцово', icon:'🚗', box:[54.8, 55.85, 36.9, 38.0],
+    refs:[['Москва',55.75,37.62],['Подольск',55.43,37.54],['Чехов',55.14,37.46]], curve:-60, mkad:true }
+};
+let flyTimer = null, flyDone = null;
+function flight(a, b, done){
+  const cfg = FLY[a + '>' + b] || { kicker:'Переезд', title:C[a].name+' → '+C[b].name, icon:'🚗', box:[Math.min(C[a].lat,C[b].lat)-1, Math.max(C[a].lat,C[b].lat)+1, Math.min(C[a].lon,C[b].lon)-1, Math.max(C[a].lon,C[b].lon)+1], refs:[], curve:-40 };
+  $('#flyKicker').textContent = cfg.kicker; $('#flyTitle').textContent = cfg.title; $('#flyKm').textContent = '0';
+  ['#flyKicker','#flyTitle','.flytext .km'].forEach(s => { const n = $(s); n.style.animation = 'none'; n.offsetHeight; n.style.animation = ''; });
+  const [la0, la1, lo0, lo1] = cfg.box, VW = 400, VH = 800;
+  const pr = (lat, lon) => [50 + (lon-lo0)/(lo1-lo0)*(VW-100), 200 + (la1-lat)/(la1-la0)*(VH-340)];
+  const A = pr(C[a].lat, C[a].lon), B = pr(C[b].lat, C[b].lon);
+  const mx = (A[0]+B[0])/2 + cfg.curve, my = (A[1]+B[1])/2;
+  let s = `<defs><radialGradient id="g2"><stop offset="0" stop-color="#ffdf9a" stop-opacity=".95"/><stop offset="1" stop-color="#ffdf9a" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="1.2" fill="#ffffff" fill-opacity=".1"/></pattern>
+    <linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}"><stop offset="0" stop-color="#e07a8c"/><stop offset="1" stop-color="#ffdf9a"/></linearGradient></defs>
+    <g id="world"><rect x="-400" y="-400" width="1200" height="1600" fill="url(#dots)"/>`;
+  for(let k = 1; k < 7; k++){ const y = 200 + k*(VH-340)/7; s += `<line x1="-400" x2="800" y1="${y}" y2="${y}" stroke="#fff" stroke-opacity=".04"/>`; }
+  if(cfg.mkad){ const [mxC, myC] = pr(55.75, 37.62); s += `<ellipse cx="${mxC}" cy="${myC}" rx="${0.27/(lo1-lo0)*(VW-100)}" ry="${0.16/(la1-la0)*(VH-340)}" fill="#e07a8c" fill-opacity=".06" stroke="#e07a8c" stroke-opacity=".4" stroke-dasharray="4 4"/>`; }
+  cfg.refs.forEach(([n, lat, lon]) => { const [x, y] = pr(lat, lon); s += `<circle cx="${x}" cy="${y}" r="3" fill="#6b7186"/><text x="${x+7}" y="${y+4}" fill="#7d8398" font-size="12" font-family="Manrope">${n}</text>`; });
+  s += `<path d="M${A[0]} ${A[1]} Q ${mx} ${my} ${B[0]} ${B[1]}" fill="none" stroke="#ffffff" stroke-opacity=".15" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>
+    <path id="ftrail" d="M${A[0]} ${A[1]} Q ${mx} ${my} ${B[0]} ${B[1]}" fill="none" stroke="url(#trail)" stroke-width="3.5" stroke-linecap="round"/>`;
+  [[A, C[a].name], [B, C[b].name]].forEach(([q, n], j) => { s += `<circle cx="${q[0]}" cy="${q[1]}" r="28" fill="url(#g2)" opacity="${j?0:1}" id="halo${j}"/>
+    <circle cx="${q[0]}" cy="${q[1]}" r="7" fill="${j?'#2a2f42':'#e8c46c'}" stroke="#ffdf9a" stroke-width="2" id="pin${j}"/>
+    <text x="${q[0]}" y="${q[1] + (j ? -18 : 32)}" text-anchor="middle" fill="#f4efe6" font-size="15" font-weight="800" font-family="Manrope">${n}</text>`; });
+  s += `</g><g id="plane"><circle r="24" fill="url(#g2)"/><text id="picon" text-anchor="middle" dominant-baseline="central" font-size="28">${cfg.icon}</text></g>`;
+  const svg = $('#flySvg'); svg.innerHTML = s; show('fly'); hap('medium');
+  const fp = svg.querySelector('#ftrail'), plane = svg.querySelector('#plane'), world = svg.querySelector('#world');
+  const L = fp.getTotalLength(), km = haversine(C[a], C[b]), dur = 3000, t0 = performance.now() + 600;
+  fp.style.strokeDasharray = L; fp.style.strokeDashoffset = L;
+  let alive = true;
+  const finishFly = () => { if(!alive) return; alive = false; clearTimeout(flyTimer); const fl = $('#flash'); fl.classList.remove('go'); fl.offsetHeight; fl.classList.add('go'); hap('heavy'); setTimeout(done, 380); };
+  flyDone = finishFly;
+  (function f(t){ if(!alive) return; const k = Math.max(0, Math.min(1, (t - t0)/dur)); const e = k < .5 ? 4*k*k*k : 1 - Math.pow(-2*k+2, 3)/2;
+    fp.style.strokeDashoffset = L*(1-e); const pt = fp.getPointAtLength(L*e), pt2 = fp.getPointAtLength(Math.min(L, L*e + 2)), pt0 = fp.getPointAtLength(Math.max(0, L*e - 2));
+    const ang = Math.atan2(pt2.y - pt0.y, pt2.x - pt0.x)*180/Math.PI;
+    plane.setAttribute('transform', `translate(${pt.x},${pt.y})`);
+    svg.querySelector('#picon').setAttribute('transform', cfg.icon === '✈️' ? `rotate(${ang + 45})` : (pt2.x < pt0.x ? 'scale(-1,1)' : ''));
+    const z = 1 + 0.3*Math.sin(Math.PI*e); world.setAttribute('transform', `translate(${pt.x*(1-z)},${pt.y*(1-z)}) scale(${z})`);
+    $('#flyKm').textContent = Math.round(km*e);
+    if(k >= .98){ svg.querySelector('#pin1').setAttribute('fill', '#e8c46c'); svg.querySelector('#halo1').setAttribute('opacity', 1); }
+    if(k < 1) requestAnimationFrame(f); else flyTimer = setTimeout(finishFly, 600); })(performance.now());
+}
+$('#skip').onclick = () => flyDone && flyDone();
+
+function buildList(){
+  const box = $('#lscroll'); let h = '', n = 0;
+  DATA.cities.forEach(c => { const pts = P.filter(p => p.city === c.id);
+    h += `<div class="lcity">${c.emoji} ${esc(c.name)} <small>${pts.length} точки</small></div><div class="lgrid">`;
+    pts.forEach(p => { h += `<button class="litem" data-i="${P.indexOf(p)}" style="animation-delay:${(n++)*0.05}s"><img src="${p.photo}" alt=""><b>${p.id}</b><span>${esc(p.name)}</span></button>`; });
+    h += '</div>'; });
+  box.innerHTML = h;
+  box.querySelectorAll('.litem').forEach(el => el.onclick = () => { hap(); idx = +el.dataset.i; show('trip'); render(null, null); });
+}
+$('#toList').onclick = () => { buildList(); show('list'); };
+$('#listBack').onclick = () => show('hero');
+
+function finish(){
+  $('#thumbs').innerHTML = P.map((p, i) => `<img src="${p.photo}" style="animation-delay:${0.3 + i*0.07}s">`).join('');
+  show('fin'); try{ tg.HapticFeedback.notificationOccurred('success') }catch(e){} confetti();
+}
+$('#again').onclick = () => { idx = 0; show('trip'); render(null, null); };
+$('#finList').onclick = () => { buildList(); show('list'); };
+function confetti(){
+  const cv = $('#conf'), ctx = cv.getContext('2d'), dpr = devicePixelRatio || 1; cv.width = innerWidth*dpr; cv.height = innerHeight*dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cols = ['#e8c46c','#ffdf9a','#e07a8c','#5fd0c4','#f4efe6'];
+  const ps = Array.from({length:140}, () => ({ x: innerWidth/2, y: innerHeight*0.35, vx: (Math.random()-.5)*12, vy: -Math.random()*12-4, r: 3+Math.random()*5, c: cols[Math.random()*5|0], a: Math.random()*6, va: (Math.random()-.5)*.3 }));
+  const t0 = performance.now();
+  (function f(t){ ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ps.forEach(p => { p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r); ctx.restore(); });
+    if(t - t0 < 3500) requestAnimationFrame(f); else ctx.clearRect(0, 0, innerWidth, innerHeight); })(t0);
+}
+(function(){ const sp = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || '';
+  const m = location.search.match(/[?&]p=(\d+)/) || sp.match(/p(\d+)/);
+  if(m){ const i = P.findIndex(p => p.id === +m[1]); if(i >= 0){ idx = i; show('trip'); render(null, null); } } })();
+</script>
+</body>
+</html>
