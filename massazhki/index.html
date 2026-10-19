@@ -21,7 +21,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .screen.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .6s var(--ease),visibility 0s}
 
 .orbs{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
-.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:float 14s ease-in-out infinite}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;}
 .orb.a{width:340px;height:340px;background:#7a4a9a;top:-80px;left:-90px}
 .orb.b{width:300px;height:300px;background:#b5654f;bottom:-60px;right:-80px;animation-delay:-5s}
 .orb.c{width:220px;height:220px;background:#2f6b8a;top:40%;left:55%;animation-delay:-9s;opacity:.35}
@@ -30,7 +30,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 #hero{z-index:2;justify-content:flex-end;padding:0 24px calc(28px + env(safe-area-inset-bottom))}
 .hero-bg{position:absolute;inset:0;z-index:-1;overflow:hidden}
-.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.15);transition:opacity 1.6s ease,transform 7s linear}
+.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.6s ease}
 .hero-bg img.on{opacity:.55;transform:scale(1)}
 .hero-bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,9,13,.2) 0%,rgba(8,9,13,.55) 45%,var(--bg) 82%)}
 .kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px;opacity:0;animation:up .9s var(--ease) .2s forwards}
@@ -46,7 +46,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .btn{flex:1;height:56px;border-radius:18px;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s}
 .btn:active{transform:scale(.96)}
 .btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold) 50%,#c9963f);color:#1a1307;box-shadow:0 10px 30px rgba(232,196,108,.35);position:relative;overflow:hidden}
-.btn.gold:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 3.2s ease-in-out infinite}
+.btn.gold:after{display:none}
+.x1{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 3.2s ease-in-out infinite}
 @keyframes shine{0%,60%{left:-60%}100%{left:130%}}
 .btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);flex:.7}
 @keyframes up{to{opacity:1;transform:none}}
@@ -63,10 +64,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .iconbtn{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:17px;flex:none}
 .stage{flex:1;position:relative;overflow:hidden}
 .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:0 16px 24px;-webkit-overflow-scrolling:touch;transition:transform .65s var(--ease),opacity .65s var(--ease)}
-.page.enterR{transform:translateX(105%);opacity:0}
-.page.enterL{transform:translateX(-105%);opacity:0}
-.page.exitL{transform:translateX(-40%) scale(.92);opacity:0}
-.page.exitR{transform:translateX(40%) scale(.92);opacity:0}
+.page.exitL,.page.exitR{opacity:0}
 
 .mapcard{position:relative;height:150px;border-radius:22px;background:radial-gradient(120% 120% at 30% 20%,#1b2034,#0e1019);border:1px solid var(--line);overflow:hidden;margin-bottom:12px}
 .mapcard svg{position:absolute;inset:0;width:100%;height:100%}
@@ -74,7 +72,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .mapdist{position:absolute;right:12px;top:8px;font-size:12px;color:var(--gold);font-weight:700}
 
 .photo{position:relative;height:330px;margin-top:6px;border-radius:26px;overflow:hidden;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
-.photo img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;animation:kb 14s ease-in-out infinite alternate}
+.photo img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;}
 @keyframes kb{0%{transform:scale(1.02) translate(0,0)}100%{transform:scale(1.14) translate(-3%,-2%)}}
 .photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(5,6,10,.92))}
 /*n*/.photo .num{position:absolute;top:14px;left:14px;z-index:2;font-family:var(--serif);font-size:15px;font-weight:800;color:#1a1307;background:var(--gold);border-radius:999px;padding:5px 12px}
@@ -83,8 +81,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .photo h2{font-family:var(--serif);font-size:27px;line-height:1.08;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .photo p{color:#d9d3c7;font-size:13px}
 
-.reveal>*{opacity:0;transform:translateY(14px);animation:up .6s var(--ease) forwards}
-.photo{opacity:0;animation:up .7s var(--ease) forwards}
+.page{animation:fade .35s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
 .chip{background:rgba(95,208,196,.07);border:1px solid rgba(95,208,196,.22);color:#bff0ea;font-size:12px;padding:6px 11px;border-radius:999px;font-weight:600}
 .block{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
@@ -124,12 +122,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .litem span{position:absolute;left:10px;right:10px;bottom:10px;z-index:2;font-weight:700;font-size:13px;line-height:1.25}
 
 #fin{z-index:5;align-items:center;justify-content:center;text-align:center;padding:24px;background:var(--bg)}
-.fin-ring{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;font-size:62px;background:radial-gradient(circle,rgba(232,196,108,.25),transparent 70%);border:1px solid rgba(232,196,108,.4);margin-bottom:22px;animation:pulse 2.4s ease-in-out infinite}
+.fin-ring{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;font-size:62px;background:radial-gradient(circle,rgba(232,196,108,.25),transparent 70%);border:1px solid rgba(232,196,108,.4);margin-bottom:22px;}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,196,108,.35)}50%{box-shadow:0 0 0 22px rgba(232,196,108,0)}}
 #fin h2{font-family:var(--serif);font-size:38px;margin-bottom:10px}
 #fin p{color:#cfc8bb;line-height:1.5;margin-bottom:22px;max-width:340px}
 .thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:100%;max-width:360px;margin-bottom:24px}
-.thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;opacity:0;animation:pop .5s var(--ease) forwards}
+.thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;opacity:0;opacity:1}
 @keyframes pop{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
 .fin-btns{display:flex;gap:10px;width:100%;max-width:360px}
 canvas#conf{position:fixed;inset:0;width:100%;height:100%;z-index:6;pointer-events:none}
@@ -346,8 +344,7 @@ function go(to){
   const from = idx; hap();
   if(to > from && P[to].city !== P[from].city){ busy = true; flight(P[from].city, P[to].city, () => { idx = to; show('trip'); render(null, null); busy = false; }); return; }
   busy = true;
-  if(to > from){ hop(from, to, () => { idx = to; show('trip'); render(null, null); busy = false; }); return; }
-  idx = to; render('back', null); setTimeout(() => busy = false, 650);
+  idx = to; render(null, null); setTimeout(() => busy = false, 650);
 }
 $('#next').onclick = () => go(idx + 1);
 $('#prev').onclick = () => go(idx - 1);
@@ -420,7 +417,7 @@ $('#listBack').onclick = () => show('hero');
 
 function finish(){
   $('#thumbs').innerHTML = P.map((p, i) => `<img src="${p.photo}" style="animation-delay:${0.3 + i*0.07}s">`).join('');
-  show('fin'); try{ tg.HapticFeedback.notificationOccurred('success') }catch(e){} confetti();
+  show('fin'); try{ tg.HapticFeedback.notificationOccurred('success') }catch(e){}
 }
 $('#again').onclick = () => { idx = 0; show('trip'); render(null, null); };
 $('#finList').onclick = () => { buildList(); show('list'); };
