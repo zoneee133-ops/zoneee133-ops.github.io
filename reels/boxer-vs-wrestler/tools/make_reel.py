@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Сборка рилса «Боксёр vs борец» по BRIEF.md (шаги 5-11 раздела 8).
 
+  python3 tools/make_reel.py stills  # stills/NNx.png -> clips/raw/NN.mp4 (позы, наезд, тряска)
   python3 tools/make_reel.py cut     # clips/raw/NN.* -> clips/cut/NN.mp4
   python3 tools/make_reel.py build   # склейка, грейдинг, субтитры, звук -> out/reel.mp4
   python3 tools/make_reel.py check   # контакт-лист кадров с безопасными зонами -> out/check.png
@@ -59,6 +60,16 @@ SFX = [
 GRADE = ("colorbalance=rs=-0.04:gs=-0.01:bs=0.06:rm=-0.02:bm=0.03:"
          "rh=0.05:gh=0.02:bh=-0.04,eq=contrast=1.06:saturation=1.08")
 
+# Режим stills: кадр собирается из поз stills/NNa.png, NNb.png ... по порядку.
+# (наезд за позу, тряска в px на склейке поз). Остальные кадры: STILL_FX_DEFAULT.
+STILL_FX_DEFAULT = (0.06, 14)
+STILL_FX = {
+    1: (0.10, 0),   # медленный наезд
+    6: (0.12, 0),   # слоумо, без тряски
+    7: (0.05, 0),
+    10: (0.04, 0),  # стоп-кадр
+}
+
 CONFORM = (f"scale={W}:{H}:force_original_aspect_ratio=increase,"
            f"crop={W}:{H},fps={FPS},setsar=1,format=yuv420p")
 
@@ -77,6 +88,48 @@ def find_raw(root, n):
     if not hits:
         sys.exit(f"Нет clips/raw/{n:02d}.mp4. Сначала сгенерировать и отобрать клип {n}.")
     return hits[0]
+
+
+def pose_clip(src, dur, zoom, shake, out):
+    """Одна поза: фон из размытой копии, если не 9:16, плавный наезд, затухающая тряска."""
+    w2, h2 = W * 2, H * 2  # zoompan на увеличенной картинке, чтобы наезд не дёргался
+    zw, zh = int(W * 1.1) // 2 * 2, int(H * 1.1) // 2 * 2
+    n = int(round(dur * FPS))
+    vf = (f"split[a][b];"
+          f"[a]scale={w2}:{h2}:force_original_aspect_ratio=increase,crop={w2}:{h2},"
+          f"boxblur=40:2,eq=brightness=-0.12[bg];"
+          f"[b]scale={w2}:{h2}:force_original_aspect_ratio=decrease[fg];"
+          f"[bg][fg]overlay=(W-w)/2:(H-h)/2,"
+          f"zoompan=z='1+{zoom}*on/{n}':x='iw/2-iw/zoom/2':y='ih/2-ih/zoom/2':"
+          f"d=1:s={zw}x{zh}:fps={FPS},"
+          f"crop={W}:{H}:x='(iw-ow)/2+{shake}*sin(t*70)*exp(-t*12)':"
+          f"y='(ih-oh)/2+{shake}*cos(t*55)*exp(-t*12)',setsar=1,format=yuv420p")
+    ff("-loop", "1", "-framerate", str(FPS), "-i", src, "-filter_complex", vf,
+       "-frames:v", str(n), "-c:v", "libx264", "-preset", "fast", "-crf", "14", out)
+
+
+def stills(root, stills_dir):
+    raw_dir = os.path.join(root, "clips", "raw")
+    tmp = os.path.join(root, "clips", "poses")
+    os.makedirs(raw_dir, exist_ok=True)
+    os.makedirs(tmp, exist_ok=True)
+    for n, dur, _, _ in TIMELINE:
+        poses = sorted(glob.glob(os.path.join(stills_dir, f"{n:02d}[a-z].*")))
+        if not poses:
+            print(f"! нет {stills_dir}/{n:02d}a.png, кадр {n} пропускаю")
+            continue
+        zoom, shake = STILL_FX.get(n, STILL_FX_DEFAULT)
+        parts = []
+        for i, src in enumerate(poses):
+            out = os.path.join(tmp, f"{n:02d}_{i}.mp4")
+            # первая поза кадра без тряски: склейка между кадрами и так резкая
+            pose_clip(src, dur / len(poses), zoom, shake if i else 0, out)
+            parts.append(out)
+        lst = os.path.join(tmp, f"{n:02d}.txt")
+        with open(lst, "w") as f:
+            f.writelines(f"file '{os.path.abspath(p)}'\n" for p in parts)
+        ff("-f", "concat", "-safe", "0", "-i", lst, "-c", "copy",
+           os.path.join(raw_dir, f"{n:02d}.mp4"))
 
 
 def cut(root):
@@ -192,10 +245,13 @@ def check(root):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("step", choices=["cut", "build", "check", "all"])
+    p.add_argument("step", choices=["stills", "cut", "build", "check", "all"])
+    p.add_argument("--stills", help="папка с позами для шага stills (по умолчанию <root>/stills)")
     p.add_argument("--root", default=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     args = p.parse_args()
     root = os.path.abspath(args.root)
+    if args.step == "stills":
+        stills(root, os.path.abspath(args.stills or os.path.join(root, "stills")))
     if args.step in ("cut", "all"):
         cut(root)
     if args.step in ("build", "all"):
