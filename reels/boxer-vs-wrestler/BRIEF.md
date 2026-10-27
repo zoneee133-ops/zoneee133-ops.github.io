@@ -1,8 +1,8 @@
 # Рилс: «Кто победит на улице: боксёр или борец?»
 
-Это ТЗ для двух исполнителей:
-- **ChatGPT** делает модельки персонажей и локацию (разделы 2 и 3).
-- **Claude Code** генерирует видео, собирает и монтирует ролик (разделы 4–8).
+Исполнитель один: **Claude Code** через Kling.
+Рефы персонажей делаются из 2D-черновиков автора (`refs/_draft/`) через Kling image-to-image.
+Локация через Kling text-to-image. Потом видео и монтаж (разделы 4–8).
 
 Claude Code: читай этот файл целиком перед работой. Все решения сверяй с ним.
 
@@ -23,7 +23,7 @@ Claude Code: читай этот файл целиком перед работо
 
 ---
 
-## 2. Стиль и персонажи (для ChatGPT)
+## 2. Стиль и персонажи (Kling image-to-image)
 
 **Стиль: 3D-манекены без лиц.** Как обучающие анимации техники. Гладкие фигуры, голова без глаз, носа и рта. Бойцов различают только по цвету и экипировке.
 
@@ -53,6 +53,8 @@ Faceless 3D mannequin wrestler, stocky powerful build, thick neck,
 broad shoulders, light grey matte body, blue wrestling singlet,
 blue wrestling shoes.
 Reference sheet: front view, side view, back view, low wrestling stance.
+Stance: feet wider than shoulders and staggered, knees bent, hips low,
+back straight, head up, hands forward at chest level, elbows close to body.
 ```
 
 ### Второй противник (кадр 8)
@@ -62,11 +64,18 @@ black hoodie, black pants. Looks like a street guy, not a fighter.
 Reference sheet: front view, side view, back view.
 ```
 
-Сохранить: `refs/boxer.png`, `refs/wrestler.png`, `refs/thug.png`.
+Источник: `refs/_draft/boxer.png`, `wrestler.png`, `thug.png` (2D-лист автора).
+Перед загрузкой увеличить в 2 раза (ffmpeg, lanczos). Роль картинки: референс позы,
+цветов и экипировки. Стиль берётся из промпта (3D), не из черновика.
+Важно: «низкая стойка» борца в черновике нарисована неправильно (присед с руками
+на коленях). Стойку брать из промпта выше, не из картинки.
+
+Сохранить: `refs/boxer.png`, `refs/wrestler.png`, `refs/thug.png`. Разрешение 2k.
+Показать автору перед следующим шагом.
 
 ---
 
-## 3. Локация (для ChatGPT)
+## 3. Локация (Kling text-to-image)
 
 Улица в том же 3D-стиле, упрощённая, без мелких деталей.
 ```
@@ -177,7 +186,8 @@ project/
 ```
 
 Шаги:
-1. Проверить, что в `refs/` есть все 4 картинки. Если нет, остановиться и сказать.
+0. Проверить, что Kling MCP подключён (`who_am_i`). Если нет, остановиться и сказать.
+1. Сделать 4 рефа по разделам 2–3, показать автору, перегенерировать брак.
 2. Загрузить персонажей в Kling как Elements.
 3. Сгенерировать клипы 1–10 по разделу 5 → `clips/raw/`.
 4. Показать мне все клипы. Я отбираю, брак перегенерировать.
