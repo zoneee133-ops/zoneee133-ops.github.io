@@ -1,0 +1,30 @@
+[Script Info]
+; Рилс «Боксёр vs борец». Тайминги по раскадровке (BRIEF.md, раздел 4).
+; После записи voiceover.wav подогнать Start/End под реальный голос.
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+; Плашка: белый текст, чёрная подложка ~60%. Верх 10% (192 px) пустой.
+Style: Plate,Montserrat ExtraBold,66,&H00FFFFFF,&H00FFFFFF,&H66000000,&H66000000,0,0,0,0,100,100,0,0,3,20,0,8,60,60,230,1
+; Субтитры: белые, чёрная обводка. Низ 20% (384 px) пустой.
+Style: Sub,Montserrat ExtraBold,86,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,7,0,2,70,70,470,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.00,0:00:36.00,Plate,,0,0,0,,Кто победит на улице:\Nбоксёр или борец?
+Dialogue: 0,0:00:03.00,0:00:06.00,Sub,,0,0,0,,{\c&H00FF7B2F&}БОРЕЦ{\c&H00FFFFFF&} ПРОХОДИТ\NВ НОГИ
+Dialogue: 0,0:00:06.00,0:00:10.00,Sub,,0,0,0,,НО ВСТРЕЧНЫЙ\NУДАР
+Dialogue: 0,0:00:10.00,0:00:13.00,Sub,,0,0,0,,СКОРОСТЬ И СИЛА
+Dialogue: 0,0:00:13.00,0:00:16.00,Sub,,0,0,0,,В КЛИНЧЕ\NНЕ УДАРИШЬ
+Dialogue: 0,0:00:16.00,0:00:19.00,Sub,,0,0,0,,БЕТОН, НЕ КОВЁР
+Dialogue: 0,0:00:19.00,0:00:22.00,Sub,,0,0,0,,ЕЩЁ ПОЙМАЙ
+Dialogue: 0,0:00:22.00,0:00:26.00,Sub,,0,0,0,,ИХ ДВОЕ
+Dialogue: 0,0:00:26.00,0:00:29.00,Sub,,0,0,0,,БРОСИЛ И ВСТАЛ
+Dialogue: 0,0:00:29.00,0:00:33.00,Sub,,0,0,0,,1 НА 1: {\c&H00FF7B2F&}БОРЕЦ{\c&H00FFFFFF&}\NТОЛПА: {\c&H00303BFF&}БОКСЁР
+Dialogue: 0,0:00:33.00,0:00:36.00,Sub,,0,0,0,,КОГО ВЫБЕРЕШЬ? ↓
